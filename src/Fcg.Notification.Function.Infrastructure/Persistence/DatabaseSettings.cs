@@ -1,4 +1,6 @@
-﻿namespace Fcg.Notification.Function.Infrastructure.Persistence
+﻿using Microsoft.Data.SqlClient;
+
+namespace Fcg.Notification.Function.Infrastructure.Persistence
 {
     internal class DatabaseSettings
     {
@@ -9,5 +11,15 @@
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public const string DatabaseSettingsSection = "DatabaseSettings";
+
+        public string ToConnectionString() => new SqlConnectionStringBuilder
+        {
+            DataSource = $"{Host},{Port}",
+            InitialCatalog = DatabaseName,
+            UserID = Username,
+            Password = Password,
+            TrustServerCertificate = true,
+            Encrypt = false
+        }.ConnectionString;
     }
 }
