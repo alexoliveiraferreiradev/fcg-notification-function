@@ -1,4 +1,5 @@
-﻿using Fcg.Notification.Function.Infrastructure.Consumers;
+﻿using Fcg.Core.WebApi.MessageBroker;
+using Fcg.Notification.Function.Infrastructure.Consumers;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
@@ -11,14 +12,15 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
     {
         public static IServiceCollection AddMessageBrokerExtension(this IServiceCollection services,IConfiguration configuration)
         {
-            services.AddOptions<RabbitMqSettings>().BindConfiguration(RabbitMqSettings.SectionName)
+            services.AddOptions<RabbitMqConnectionSettings>().BindConfiguration(RabbitMqConnectionSettings.SectionName)
           .ValidateDataAnnotations().ValidateOnStart();
+
             services.AddMassTransit(x =>
             {
                 x.AddConsumers(typeof(PaymentFailedEventConsumer).Assembly);
                 x.UsingRabbitMq((context, cfg) =>
                 {
-                    var rabbitMqConfig = context.GetRequiredService<IOptions<RabbitMqSettings>>().Value;
+                    var rabbitMqConfig = context.GetRequiredService<IOptions<NotificationServiceRabbitSettings>>().Value;
 
                     cfg.Host(rabbitMqConfig.Host, rabbitMqConfig.Port, "/", h =>
                     {

@@ -1,4 +1,4 @@
-﻿using Fcg.Notification.Function.Infrastructure.Caching;
+﻿using Fcg.Core.WebApi.Caching;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
@@ -7,15 +7,23 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
 {
     internal static class CachingExtensions
     {
-        public static IServiceCollection AddCachingExtension(this IServiceCollection services, IConfiguration configuration )
+        public static IServiceCollection AddCacheExtension(this IServiceCollection services, IConfiguration configuration )
         {
-            var redisConfig = configuration.GetSection(RedisSettings.RedisSectionName).Get<RedisSettings>();
-            ArgumentNullException.ThrowIfNull(redisConfig, nameof(RedisSettings));
-            services.Configure<RedisSettings>(configuration.GetSection(RedisSettings.RedisSectionName));
+            services.AddOptions<RedisConnectionSettings>()
+                .Bind(configuration.GetSection(RedisConnectionSettings.RedisSectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            var redisConfig = configuration.GetSection(RedisConnectionSettings.RedisSectionName).Get<RedisConnectionSettings>();
+            ArgumentNullException.ThrowIfNull(redisConfig, nameof(RedisConnectionSettings));
+            services.Configure<RedisConnectionSettings>(configuration.GetSection(RedisConnectionSettings.RedisSectionName));
+
+            var host = redisConfig.Host;
+            var port = redisConfig.Port;
 
             var configurationOptions = new ConfigurationOptions
             {
-                EndPoints = { { redisConfig.Host, redisConfig.Port } },
+                EndPoints = { { host, port } },
                 Password = redisConfig.Password,
                 AbortOnConnectFail = false,
                 ConnectRetry = 5,

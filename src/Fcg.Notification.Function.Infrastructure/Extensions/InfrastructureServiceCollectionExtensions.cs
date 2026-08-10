@@ -6,8 +6,6 @@ using Fcg.Notification.Function.Infrastructure.Idempotency;
 using Fcg.Notification.Function.Infrastructure.Persistence;
 using Fcg.Notification.Function.Infrastructure.Repository;
 using Fcg.Notification.Function.Infrastructure.Services;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,9 +16,9 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddMessageBrokerExtension(configuration);
-            services.AddCachingExtension(configuration);
+            services.AddCacheExtension(configuration);
             services.AddHealthCheckExtension(configuration);
-            services.AddDbContextExtension(configuration);
+            services.AddDatabaseExtension(configuration);
             services.AddScoped<IUserSnapshotRepository,UserSnapshotRepository>();   
             services.AddScoped<INotificationRepository, NotificationRepository>();           
             services.AddScoped<IEmailService, EmailService>();

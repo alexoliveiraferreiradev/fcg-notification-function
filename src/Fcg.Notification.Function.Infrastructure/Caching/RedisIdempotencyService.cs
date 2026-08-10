@@ -1,5 +1,5 @@
+using Fcg.Core.WebApi.Caching;
 using Fcg.Notification.Function.Application.Ports;
-using Fcg.Notification.Function.Infrastructure.Caching;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
@@ -8,9 +8,9 @@ namespace Fcg.Notification.Function.Infrastructure.Idempotency
     public class RedisIdempotencyService : IIdempotencyService
     {
         private readonly IConnectionMultiplexer _redis;
-        private readonly RedisSettings _redisOptions;
+        private readonly RedisConnectionSettings _redisOptions;
 
-        public RedisIdempotencyService(IConnectionMultiplexer redis, IOptions<RedisSettings> redisOptions)
+        public RedisIdempotencyService(IConnectionMultiplexer redis, IOptions<RedisConnectionSettings> redisOptions)
         {
            _redis = redis;
            _redisOptions = redisOptions.Value;
@@ -27,7 +27,7 @@ namespace Fcg.Notification.Function.Infrastructure.Idempotency
         {
             var db = _redis.GetDatabase();
             var key = $"{_redisOptions.InstanceName}:notifications:events:{eventId}";
-            var expiry = TimeSpan.FromDays(_redisOptions.ExpirationInDays);
+            var expiry = TimeSpan.FromDays(3);
 
             bool isAcquired = await db.StringSetAsync(key, "processing_or_processed", expiry, When.NotExists);
 

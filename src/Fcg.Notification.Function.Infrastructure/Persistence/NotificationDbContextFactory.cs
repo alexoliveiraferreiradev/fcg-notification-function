@@ -1,3 +1,4 @@
+using Fcg.Core.WebApi.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -13,16 +14,9 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence
                 .AddEnvironmentVariables()
                 .Build();
 
-            var dbConfig = configuration.GetSection(DatabaseSettings.DatabaseSettingsSection).Get<DatabaseSettings>();
-
-            if (dbConfig is null || string.IsNullOrWhiteSpace(dbConfig.Host) || string.IsNullOrWhiteSpace(dbConfig.DatabaseName))
-            {
-                throw new InvalidOperationException(
-                    "DatabaseSettings nao configurado para design-time. Preencha a secao Values do local.settings.json " +
-                    "(DatabaseSettings__Host, DatabaseSettings__DatabaseName, DatabaseSettings__Username, DatabaseSettings__Password) " +
-                    "ou exporte as mesmas chaves como variaveis de ambiente.");
-            }
-
+            var dbConfig = configuration.GetSection(DatabaseConnectionSettings.DatabaseSettingsSection).Get<DatabaseConnectionSettings>();
+            ArgumentNullException.ThrowIfNull(dbConfig, nameof(DatabaseConnectionSettings));
+            
             var options = new DbContextOptionsBuilder<NotificationDbContext>()
                 .UseSqlServer(dbConfig.ToConnectionString())
                 .Options;
