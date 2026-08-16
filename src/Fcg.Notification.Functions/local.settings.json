@@ -12,6 +12,7 @@
     "RabbitMqSettings:Port": "5672",
     "RabbitMqSettings:Username": "guest",
     "RabbitMqSettings:Password": "guest",
+    "RabbitMqConnection": "amqp://guest:guest@localhost:5672",
     "RedisSettings:Host": "localhost",
     "RedisSettings:Port": "6379",
     "RedisSettings:Password": "TechChallenge@2026",
