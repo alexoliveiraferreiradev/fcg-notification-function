@@ -13,7 +13,7 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
         {
             // Arrange
             //Act
-            var userSnapshot = new UserSnapshot(GetName(), GetEmail());
+            var userSnapshot = new UserSnapshot(Guid.NewGuid(), GetName(), GetEmail());
             //Arrange
             Assert.NotEmpty(userSnapshot.Name);
             Assert.NotEmpty(userSnapshot.Email);
@@ -26,14 +26,14 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
             string name = null;
             string email = GetEmail();
             // Act & Assert
-            Assert.Throws<DomainException>(() => new UserSnapshot(name, email));
+            Assert.Throws<DomainException>(() => new UserSnapshot(Guid.NewGuid(), name, email));
         }
 
         [Fact]
         public void ApplyChanges_ShouldUpdateProperties()
         {
             // Arrange
-            var userSnapshot = new UserSnapshot(GetName(), GetEmail());
+            var userSnapshot = new UserSnapshot(Guid.NewGuid(), GetName(), GetEmail());
             var newName = "Novo Nome";
             var ocurredAt = DateTime.UtcNow;
             // Act
@@ -47,7 +47,7 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
         public void ApplyChanges_ShouldThrowDomainException_WhenNameIsNullOrEmpty()
         {
             // Arrange
-            var userSnapshot = new UserSnapshot(GetName(), GetEmail());
+            var userSnapshot = new UserSnapshot(Guid.NewGuid(), GetName(), GetEmail());
             string newName = null;
             var ocurredAt = DateTime.UtcNow;
             // Act & Assert
@@ -58,7 +58,7 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
         public void ApplyChanges_ShouldNotUpdateProperties_WhenOcurredIsEarlierThanLastSyncedAt()
         {
             // Arrange
-            var userSnapshot = new UserSnapshot(GetName(), GetEmail());
+            var userSnapshot = new UserSnapshot(Guid.NewGuid(), GetName(), GetEmail());
             var recentDate = DateTime.UtcNow;
             var newName = "Novo Nome";
             userSnapshot.ApplyChanges(newName, recentDate);
@@ -74,7 +74,7 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
         public void ApplyChanges_ShouldNotUpdateProperties_WhenOcurredIsEarlierThanLastSyncedAtAndNameIsNull()
         {
             // Arrange
-            var userSnapshot = new UserSnapshot(GetName(), GetEmail());
+            var userSnapshot = new UserSnapshot(Guid.NewGuid(), GetName(), GetEmail());
             var recentDate = DateTime.UtcNow;
             var newName = "Novo Nome";
             userSnapshot.ApplyChanges(newName, recentDate);
@@ -90,7 +90,7 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
         public void ApplyChanges_ShouldUpdateProperties_WhenOcurredDateAndLastSyncedAtAreEqual()
         {
             // Arrange
-            var userSnapshot = new UserSnapshot(GetName(), GetEmail());
+            var userSnapshot = new UserSnapshot(Guid.NewGuid(), GetName(), GetEmail());
             var recentDate = DateTime.UtcNow;
             var newName = "Novo Nome";
             userSnapshot.ApplyChanges(newName, recentDate);

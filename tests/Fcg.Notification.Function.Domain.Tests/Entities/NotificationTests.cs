@@ -15,7 +15,7 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
         {
             // Arrange
             // Act
-            var notification = new NotificationMessage(GetEmail(), NotificationType.Welcome);
+            var notification = new NotificationMessage(Guid.NewGuid(),GetEmail(), NotificationType.Welcome);
 
             // Assert
             notification.Id.Should().NotBeEmpty();
@@ -29,7 +29,7 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
         public void Construtor_ShouldThrowDomainException_WhenEmailIsInvalid()
         {
             // Arrange
-            Action act = () => new NotificationMessage(new EmailAddress("invalid-email"), NotificationType.Welcome);
+            Action act = () => new NotificationMessage(Guid.NewGuid(),new EmailAddress("invalid-email"), NotificationType.Welcome);
             // Act & Assert
             act.Should().Throw<DomainException>().WithMessage(DomainMessages.EmailInvalid);
         }
@@ -38,7 +38,7 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
         public void MarkAsSent_ShouldUpdateStatusAndSentAt()
         {
             // Arrange
-            var notification = new NotificationMessage(GetEmail(), NotificationType.Welcome);
+            var notification = new NotificationMessage(Guid.NewGuid(),GetEmail(), NotificationType.Welcome);
             // Act
             notification.MarkAsSent();
             // Assert
@@ -49,7 +49,7 @@ namespace Fcg.Notification.Function.Domain.Tests.Entities
         public void MarkAsSent_ShouldThrowDomainException_WhenAlreadySent()
         {
             // Arrange
-            var notification = new NotificationMessage(GetEmail(), NotificationType.Welcome);
+            var notification = new NotificationMessage(Guid.NewGuid(),GetEmail(), NotificationType.Welcome);
             notification.MarkAsSent();
             // Act
             Action act = () => notification.MarkAsSent();

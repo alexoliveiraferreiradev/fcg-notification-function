@@ -1,7 +1,8 @@
 ﻿using Fcg.Core.Abstractions.Common.Exceptions;
 using Fcg.Notification.Function.Application.Common.Interfaces;
-using Fcg.Notification.Function.Application.Ports;
+using Fcg.Notification.Function.Domain.Entities;
 using Fcg.Notification.Function.Domain.Enum;
+using Fcg.Notification.Function.Domain.Repositories;
 using Fcg.Notification.Function.Domain.ValueObject;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,7 @@ namespace Fcg.Notification.Function.Application.UseCase.PaymentRejectEmail
             var emailRecipient = new EmailAddress(userProfile.Email);
 
 
-            var notification = new Domain.Entities.NotificationMessage(emailRecipient, NotificationType.OrderConfirmation);
+            var notification = new NotificationMessage(userProfile.UserId, emailRecipient, NotificationType.OrderConfirmation);
 
             var (subject, body) = notification.GeneratePaymentRejectionContent(command.OrderId, userProfile.Name, command.Reason);
 

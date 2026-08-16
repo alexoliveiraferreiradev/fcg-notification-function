@@ -1,9 +1,9 @@
 ﻿using Fcg.Core.Abstractions.Common.Exceptions;
 using Fcg.Core.Abstractions.Resources;
 using Fcg.Notification.Function.Application.Common.Interfaces;
-using Fcg.Notification.Function.Application.Ports;
 using Fcg.Notification.Function.Domain.Entities;
 using Fcg.Notification.Function.Domain.Enum;
+using Fcg.Notification.Function.Domain.Repositories;
 using Fcg.Notification.Function.Domain.ValueObject;
 using MediatR;
 
@@ -28,7 +28,7 @@ namespace Fcg.Notification.Function.Application.UseCase.DeliveryFailedEmail
 
             var emailRecipient = new EmailAddress(userProfile.Email);
 
-            var notification = new NotificationMessage(emailRecipient, NotificationType.OrderConfirmation);
+            var notification = new NotificationMessage(userProfile.UserId,emailRecipient, NotificationType.OrderConfirmation);
 
             var (subject, body) = notification.GenerateDeliveryFailedContent(command.OrderId, userProfile.Name);
 

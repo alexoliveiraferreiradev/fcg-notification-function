@@ -16,22 +16,19 @@ namespace Fcg.Notification.Function.Infrastructure.Idempotency
            _redisOptions = redisOptions.Value;
         }
 
-        public async Task ReleaseAsync(Guid eventId)
+        public async Task ReleaseAsync(string key)
         {
             var db = _redis.GetDatabase();
-            var key = $"{_redisOptions.InstanceName}:notifications:events:{eventId}";
-            await db.KeyDeleteAsync(key);
+            var fullKey = $"{_redisOptions.InstanceName}{key}";
+            await db.KeyDeleteAsync(fullKey);
         }
 
-        public async Task<bool> TryProcessAsync(Guid eventId)
+        public async Task<bool> TryProcessAsync(string key)
         {
             var db = _redis.GetDatabase();
-            var key = $"{_redisOptions.InstanceName}:notifications:events:{eventId}";
-            var expiry = TimeSpan.FromDays(3);
-
-            bool isAcquired = await db.StringSetAsync(key, "processing_or_processed", expiry, When.NotExists);
-
-            return isAcquired;
+            var fullKey = $"{_redisOptions.InstanceName}{key}";
+            var expiry = TimeSpan.FromDays(_redisOptions.ExpirationInDays);
+            return await db.StringSetAsync(fullKey, "processing_or_processed", expiry, When.NotExists);
         }
     }
 }

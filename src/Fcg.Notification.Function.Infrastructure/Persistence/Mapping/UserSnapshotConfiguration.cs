@@ -12,6 +12,9 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence.Mapping
 
             builder.HasKey(u => u.Id);
 
+            builder.HasIndex(u => u.UserId)
+                   .IsUnique();
+
             builder.Property(u => u.Name)
                 .HasMaxLength(100)
                 .IsRequired();

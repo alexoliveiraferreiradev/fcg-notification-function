@@ -6,8 +6,9 @@ using Fcg.Notification.Function.Domain.ValueObject;
 
 namespace Fcg.Notification.Function.Domain.Entities
 {
-    public class NotificationMessage : EntityBase
-    {        
+    public class NotificationMessage : AggregateRoot
+    {
+        public Guid UserId { get; private set; }
         public EmailAddress Recipient { get; private set; }
         public NotificationType Type { get; private set; }
         public DateTime CreatedAt { get; private set; }
@@ -18,8 +19,9 @@ namespace Fcg.Notification.Function.Domain.Entities
         {
             
         }
-        public NotificationMessage(EmailAddress recipient, NotificationType type)
+        public NotificationMessage(Guid userId,EmailAddress recipient, NotificationType type)
         {
+            UserId = userId;
             Recipient = recipient;
             Type = type;
             CreatedAt = DateTime.UtcNow;

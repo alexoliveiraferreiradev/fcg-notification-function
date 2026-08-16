@@ -10,6 +10,7 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence
         public NotificationDbContext CreateDbContext(string[] args)
         {
             var configuration = new ConfigurationBuilder()
+                .AddUserSecrets<NotificationDbContextFactory>(optional: true)
                 .AddInMemoryCollection(ReadLocalSettings())
                 .AddEnvironmentVariables()
                 .Build();

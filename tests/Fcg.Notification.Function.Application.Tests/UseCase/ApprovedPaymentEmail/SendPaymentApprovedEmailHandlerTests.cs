@@ -47,7 +47,7 @@ namespace Fcg.Notification.Function.Application.Tests.UseCase.ApprovedPaymentEma
 
             var emailValido = ObtemEmailValido().Address;   
 
-            var userSnapshot = new UserSnapshot("Usuario Teste", emailValido);
+            var userSnapshot = new UserSnapshot(Guid.NewGuid(),"Usuario Teste", emailValido);
 
             _userSnaphotRepositoryMock.Setup(r=>r.GetByUserIdAsync(command.UsuarioId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userSnapshot);
@@ -82,7 +82,7 @@ namespace Fcg.Notification.Function.Application.Tests.UseCase.ApprovedPaymentEma
           
             var emailValido = ObtemEmailValido().Address;
             
-            var userSnapshot = new UserSnapshot("Usuario Teste", emailValido);
+            var userSnapshot = new UserSnapshot(Guid.NewGuid(),"Usuario Teste", emailValido);
             _userSnaphotRepositoryMock
                 .Setup(s => s.GetByUserIdAsync(command.UsuarioId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userSnapshot);
@@ -109,7 +109,7 @@ namespace Fcg.Notification.Function.Application.Tests.UseCase.ApprovedPaymentEma
             
             var emailValido = ObtemEmailValido().Address;
 
-            var userSnapshot = new UserSnapshot("Usuario Teste", emailValido);
+            var userSnapshot = new UserSnapshot(Guid.NewGuid(),"Usuario Teste", emailValido);
             _userSnaphotRepositoryMock
                 .Setup(s => s.GetByUserIdAsync(command.UsuarioId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userSnapshot);

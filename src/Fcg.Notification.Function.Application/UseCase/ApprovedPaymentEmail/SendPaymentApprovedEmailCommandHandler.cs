@@ -41,7 +41,7 @@ namespace Fcg.Notification.Function.Application.UseCase.ApprovedPaymentEmail
 
             var emailRecipient = new EmailAddress(userProfile.Email);
 
-            var notification = new NotificationMessage(emailRecipient, NotificationType.OrderConfirmation);
+            var notification = new NotificationMessage(userProfile.UserId, emailRecipient, NotificationType.OrderConfirmation);
 
             _notificationRepository.Add(notification);
 

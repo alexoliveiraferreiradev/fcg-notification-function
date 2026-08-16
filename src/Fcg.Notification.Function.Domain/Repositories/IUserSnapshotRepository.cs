@@ -1,6 +1,6 @@
 ﻿using Fcg.Notification.Function.Domain.Entities;
 
-namespace Fcg.Notification.Function.Application.Common.Interfaces
+namespace Fcg.Notification.Function.Domain.Repositories
 {
     public interface IUserSnapshotRepository
     {
