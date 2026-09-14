@@ -1,60 +1,32 @@
 ﻿using Fcg.Core.WebApi.MessageBroker;
-using Fcg.Notification.Function.Infrastructure.Consumers;
-using Fcg.Notification.Function.Infrastructure.MessageBroker;
-using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
 
 namespace Fcg.Notification.Function.Infrastructure.Extensions
 {
     internal static class MessageBrokerExtensions
     {
-        public static IServiceCollection AddMessageBrokerExtension(this IServiceCollection services,IConfiguration configuration)
+        public static IServiceCollection AddRabbitMqConnectionExtension(this IServiceCollection services,IConfiguration configuration)
         {
             services.AddOptions<RabbitMqConnectionSettings>().BindConfiguration(RabbitMqConnectionSettings.SectionName)
           .ValidateDataAnnotations().ValidateOnStart();
 
-            services.AddMassTransit(x =>
+            services.AddSingleton<IConnection>(sp =>
             {
-                x.AddConsumers(typeof(PaymentFailedEventConsumer).Assembly);
-                x.UsingRabbitMq((context, cfg) =>
+                var cfg = sp.GetRequiredService<IOptions<RabbitMqConnectionSettings>>();
+
+                var factory = new ConnectionFactory
                 {
-                    var rabbitMqConfig = context.GetRequiredService<IOptions<NotificationServiceRabbitSettings>>().Value;
+                    HostName = cfg.Value.Host,
+                    Port = cfg.Value.Port,
+                    UserName = cfg.Value.Username,
+                    Password = cfg.Value.Password,
+                    VirtualHost = "/"
+                };
 
-                    cfg.Host(rabbitMqConfig.Host, rabbitMqConfig.Port, "/", h =>
-                    {
-                        h.Username(rabbitMqConfig.Username);
-                        h.Password(rabbitMqConfig.Password);
-                    });
-
-
-                    cfg.UseMessageRetry(r =>
-                    {
-                        r.Interval(3, TimeSpan.FromSeconds(5));
-                    });
-
-                    cfg.ReceiveEndpoint(rabbitMqConfig.NotificationUserCreatedQueue, e =>
-                    {
-                        e.ConfigureConsumer<UserCreatedEventConsumer>(context);
-                    });
-
-                    cfg.ReceiveEndpoint(rabbitMqConfig.NotificationPaymentFailedQueue, e =>
-                    {
-                        e.ConfigureConsumer<PaymentFailedEventConsumer>(context);
-                    });
-
-                    cfg.ReceiveEndpoint(rabbitMqConfig.NotificationPaymentProcessedQueue, e =>
-                    {
-                        e.ConfigureConsumer<PaymentProcessedEventConsumer>(context);
-                    });
-
-                    cfg.ReceiveEndpoint(rabbitMqConfig.NotificationDeliveryFailedQueue, e =>
-                    {
-                        e.ConfigureConsumer<DeliveryFailedEventConsumer>(context);
-                    });
-
-                });
+                return factory.CreateConnectionAsync().GetAwaiter().GetResult();
             });
             return services;
         }

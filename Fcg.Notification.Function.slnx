@@ -3,7 +3,7 @@
     <Project Path="src/Fcg.Notification.Function.Application/Fcg.Notification.Function.Application.csproj" Id="a39908d8-992f-40b9-82b5-dc458d5ade92" />
     <Project Path="src/Fcg.Notification.Function.Domain/Fcg.Notification.Function.Domain.csproj" Id="ca9a814c-076c-4648-b406-8fa416567987" />
     <Project Path="src/Fcg.Notification.Function.Infrastructure/Fcg.Notification.Function.Infrastructure.csproj" Id="613ba44d-5e4b-4f40-b9f6-953875e148b3" />
-    <Project Path="src/Fcg.Notification.Functions/Fcg.Notification.Functions.csproj" Id="4ad237cb-aaf6-43c4-b328-cdfc730b5ed1" />
+    <Project Path="src/Fcg.Notification.Functions/Fcg.Notification.FunctionApp.csproj" Id="4ad237cb-aaf6-43c4-b328-cdfc730b5ed1" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Fcg.Notification.Function.Application.Tests/Fcg.Notification.Function.Application.Tests.csproj" Id="5a8db684-2f72-4204-ad95-ec24142478cc" />

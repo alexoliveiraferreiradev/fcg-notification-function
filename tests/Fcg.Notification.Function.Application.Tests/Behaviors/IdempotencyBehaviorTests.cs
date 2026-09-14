@@ -29,8 +29,8 @@ namespace Fcg.Notification.Function.Application.Tests.Behaviors
         {
             //Arrange
             var command = PaymentCommand();
-
-            _idempotencyServiceMock.Setup(s => s.TryProcessAsync(command.EventId)).ReturnsAsync(false);
+            var idempotencyKey = $"{typeof(SendPaymentApprovedEmailCommand).Name}:{command.EventId}";
+            _idempotencyServiceMock.Setup(s => s.TryProcessAsync(idempotencyKey)).ReturnsAsync(false);
 
             var nextCalled = false;
             RequestHandlerDelegate<Unit> next = _ =>
@@ -39,13 +39,13 @@ namespace Fcg.Notification.Function.Application.Tests.Behaviors
                 return Task.FromResult(Unit.Value);
             };
 
-            //Act
+            //Act            
             await _behavior.Handle(command, next, CancellationToken.None);
 
             //Assert
             nextCalled.Should().BeFalse();
-            _idempotencyServiceMock.Verify(s => s.TryProcessAsync(command.EventId), Times.Once);
-            _idempotencyServiceMock.Verify(s => s.ReleaseAsync(command.EventId), Times.Never);
+            _idempotencyServiceMock.Verify(s => s.TryProcessAsync(idempotencyKey), Times.Once);
+            _idempotencyServiceMock.Verify(s => s.ReleaseAsync(idempotencyKey), Times.Never);
         }
 
         [Fact]
@@ -53,8 +53,8 @@ namespace Fcg.Notification.Function.Application.Tests.Behaviors
         {
             //Arrange             
             var command = PaymentCommand();
-
-            _idempotencyServiceMock.Setup(s => s.TryProcessAsync(command.EventId)).ReturnsAsync(true);
+            var idempotencyKey = $"{typeof(SendPaymentApprovedEmailCommand).Name}:{command.EventId}";
+            _idempotencyServiceMock.Setup(s => s.TryProcessAsync(idempotencyKey)).ReturnsAsync(true);
 
             RequestHandlerDelegate<Unit> next = _ => throw new InvalidOperationException("Test exception");
 
@@ -63,7 +63,7 @@ namespace Fcg.Notification.Function.Application.Tests.Behaviors
 
             //Assert    
             await act.Should().ThrowAsync<InvalidOperationException>();
-            _idempotencyServiceMock.Verify(s => s.ReleaseAsync(command.EventId), Times.Once);
+            _idempotencyServiceMock.Verify(s => s.ReleaseAsync(idempotencyKey), Times.Once);
         }
     }
 

@@ -2,6 +2,20 @@
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DatabaseSettings:Host": "localhost",
+    "DatabaseSettings:Port": "1433",
+    "DatabaseSettings:Username": "sa",
+    "DatabaseSettings:Password": "TechChallenge@2026",
+    "DatabaseSettings:DatabaseName": "Fcg_Notifications",
+    "RabbitMqSettings:Host": "localhost",
+    "RabbitMqSettings:Port": "5672",
+    "RabbitMqSettings:Username": "guest",
+    "RabbitMqSettings:Password": "guest",
+    "RabbitMqConnection": "amqp://guest:guest@localhost:5672",
+    "RedisSettings:Host": "localhost",
+    "RedisSettings:Port": "6379",
+    "RedisSettings:Password": "TechChallenge@2026",
+    "RedisSettings:InstanceName": "FiapCloudGames:"
   }
 }

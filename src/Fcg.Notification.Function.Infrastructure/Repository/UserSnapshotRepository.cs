@@ -1,5 +1,5 @@
-﻿using Fcg.Notification.Function.Application.Common.Interfaces;
-using Fcg.Notification.Function.Domain.Entities;
+﻿using Fcg.Notification.Function.Domain.Entities;
+using Fcg.Notification.Function.Domain.Repositories;
 using Fcg.Notification.Function.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,7 +22,7 @@ namespace Fcg.Notification.Function.Infrastructure.Repository
         public async Task<UserSnapshot?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken)
         {
             return await _context.UserSnapshots
-                 .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+                 .FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
         }
 
         public void Update(UserSnapshot userSnapshot)

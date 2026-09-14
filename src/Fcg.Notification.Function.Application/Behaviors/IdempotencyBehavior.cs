@@ -16,29 +16,25 @@ namespace Fcg.Notification.Function.Application.Behaviors
             _logger = logger;
         }
 
-       public async Task<TResponse> Handle(
-           TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(
+            TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            var canProcess = await _idempotencyService.TryProcessAsync(request.EventId);
+            var idempotencyKey = $"{typeof(TRequest).Name}:{request.EventId}";
+            var canProcess = await _idempotencyService.TryProcessAsync(idempotencyKey);
 
-            if(!canProcess)
+            if (!canProcess)
             {
-                _logger.LogInformation("Evento {EventId} já foi processado. Ignorando execução.", request.EventId);
-                return typeof(TResponse) == typeof(Unit) 
-                    ? (TResponse)(object)Unit.Value
-                    : default!;
+                _logger.LogInformation("Evento {EventId} já processado por {CommandType}. Ignorando.", request.EventId, typeof(TRequest).Name);
+                return typeof(TResponse) == typeof(Unit) ? (TResponse)(object)Unit.Value : default!;
             }
-
-            if (!await _idempotencyService.TryProcessAsync(request.EventId))
-                return default!; 
-
+                       
             try
             {
                 return await next(cancellationToken);
             }
             catch
             {
-                await _idempotencyService.ReleaseAsync(request.EventId);
+                await _idempotencyService.ReleaseAsync(idempotencyKey);
                 throw;
             }
         }

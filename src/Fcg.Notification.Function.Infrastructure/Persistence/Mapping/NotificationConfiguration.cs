@@ -12,6 +12,8 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence.Mapping
 
             builder.HasKey(n=>n.Id);
 
+            builder.HasIndex(n => n.UserId);
+
             builder.OwnsOne(n => n.Recipient, nv =>
             {
                 nv.Property(e => e.Address)
@@ -19,9 +21,16 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence.Mapping
                     .IsRequired();
             });
 
+            
             builder.Property(n => n.Type)
                 .HasConversion<int>()
                 .IsRequired();
+
+            builder.HasOne<UserSnapshot>()
+                   .WithMany()
+                   .HasForeignKey(n => n.UserId)
+                   .HasPrincipalKey(u => u.UserId)
+                   .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

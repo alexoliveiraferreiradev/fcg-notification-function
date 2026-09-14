@@ -1,10 +1,9 @@
 ﻿using Fcg.Notification.Function.Domain.Entities;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fcg.Notification.Function.Infrastructure.Persistence
 {
-    internal class NotificationDbContext : DbContext
+    public class NotificationDbContext : DbContext
     {
         public NotificationDbContext(DbContextOptions<NotificationDbContext> options) : base(options) { }
         public DbSet<NotificationMessage> Notifications { get; set; }
@@ -14,9 +13,6 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(NotificationDbContext).Assembly);
             base.OnModelCreating(modelBuilder);
-            modelBuilder.AddInboxStateEntity();
-            modelBuilder.AddOutboxMessageEntity();
-            modelBuilder.AddOutboxStateEntity();
         }
     }
 }

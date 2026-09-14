@@ -13,13 +13,14 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
 {
     public static class InfrastructureServiceCollectionExtensions
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services,
+            IConfiguration configuration)
         {
-            services.AddMessageBrokerExtension(configuration);
+            services.AddRabbitMqConnectionExtension(configuration);
             services.AddCacheExtension(configuration);
             services.AddHealthCheckExtension(configuration);
             services.AddDatabaseExtension(configuration);
-            services.AddScoped<IUserSnapshotRepository,UserSnapshotRepository>();   
+            services.AddScoped<IUserSnapshotRepository, UserSnapshotRepository>();   
             services.AddScoped<INotificationRepository, NotificationRepository>();           
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IIdempotencyService, RedisIdempotencyService>();

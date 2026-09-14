@@ -2,6 +2,7 @@ using Fcg.Core.Abstractions.Interfaces;
 using Fcg.Notification.Function.Application.Common.Interfaces;
 using Fcg.Notification.Function.Application.Ports;
 using Fcg.Notification.Function.Application.UseCase.WelcomeEmail;
+using Fcg.Notification.Function.Domain.Entities;
 using Fcg.Notification.Function.Domain.Repositories;
 using Fcg.Notification.Function.Domain.ValueObject;
 using FluentAssertions;
@@ -16,17 +17,22 @@ namespace Fcg.Notification.Function.Application.Tests.UseCase.WelcomeEmail
         private readonly Mock<INotificationRepository> _notificationRepositoryMock;
         private readonly SendWelcomeEmailCommandHandler _useCase;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly Mock<ILogger<SendWelcomeEmailCommandHandler>> _loggerMock;
+        private readonly Mock<IUserSnapshotRepository> _userSnapshotRepositoryMock;
         public SendWelcomeEmailHandlerTests()
         {
             _emailServiceMock = new Mock<IEmailService>();
             _notificationRepositoryMock = new Mock<INotificationRepository>();
             _unitOfWorkMock = new Mock<IUnitOfWork>();
+            _loggerMock = new Mock<ILogger<SendWelcomeEmailCommandHandler>>();
+            _userSnapshotRepositoryMock = new Mock<IUserSnapshotRepository>();
 
             _useCase = new SendWelcomeEmailCommandHandler(
                 _emailServiceMock.Object,
                 _notificationRepositoryMock.Object,
-                _unitOfWorkMock.Object
-
+                _unitOfWorkMock.Object,
+                _loggerMock.Object,
+                _userSnapshotRepositoryMock.Object
             );
         }
 
@@ -36,20 +42,21 @@ namespace Fcg.Notification.Function.Application.Tests.UseCase.WelcomeEmail
         {
             // Arrange
             var command = new SendWelcomeEmailCommand(Guid.NewGuid(), Guid.NewGuid(), "teste@teste.com", "Joao");
-            
+            var userSnapshot = new UserSnapshot(command.UserId,command.UserName,command.Email);
+            _userSnapshotRepositoryMock.Setup(s => s.GetByUserIdAsync(userSnapshot.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(userSnapshot);
 
             // Act
             await _useCase.Handle(command, CancellationToken.None);
 
             // Assert
             _emailServiceMock.Verify(e => e.SendEmailAsync(
-                It.Is<EmailAddress>(addr => addr.Address == command.Email), 
-                It.IsAny<string>(), 
-                It.IsAny<string>(), 
+                It.Is<EmailAddress>(addr => addr.Address == userSnapshot.Email),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Once);
-                
-          
-          
+
+
+
         }
 
         [Fact]
@@ -57,8 +64,10 @@ namespace Fcg.Notification.Function.Application.Tests.UseCase.WelcomeEmail
         {
             // Arrange
             var command = new SendWelcomeEmailCommand(Guid.NewGuid(), Guid.NewGuid(), "teste@teste.com", "Joao");
-           
-            
+            var userSnapshot = new UserSnapshot(command.UserId, command.UserName, command.Email);
+            _userSnapshotRepositoryMock.Setup(s => s.GetByUserIdAsync(userSnapshot.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(userSnapshot);
+
+
             _emailServiceMock.Setup(e => e.SendEmailAsync(It.IsAny<EmailAddress>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("SMTP Timeout"));
 
@@ -67,8 +76,8 @@ namespace Fcg.Notification.Function.Application.Tests.UseCase.WelcomeEmail
 
             // Assert
             await act.Should().ThrowAsync<Exception>().WithMessage("SMTP Timeout");
-            
-            
+
+
         }
     }
 }
