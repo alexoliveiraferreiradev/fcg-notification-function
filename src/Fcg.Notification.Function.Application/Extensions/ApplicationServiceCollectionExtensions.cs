@@ -14,7 +14,7 @@ namespace Fcg.Notification.Function.Application.Extensions
                 cfg.RegisterServicesFromAssemblies(typeof(SendPaymentApprovedEmailCommand).Assembly);
             });
            
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(IdempotencyBehavior<,>));
+            //services.AddScoped(typeof(IPipelineBehavior<,>), typeof(IdempotencyBehavior<,>));
             return services;
         }
     }
