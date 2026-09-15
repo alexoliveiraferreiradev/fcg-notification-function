@@ -75,32 +75,90 @@ As configurações de exemplo já estão versionadas em [`local.settings.json`](
 
 ## 🚀 Como Executar Localmente
 
-> ⚠️ **Este projeto roda apenas localmente.** Não há deploy em nuvem configurado, pois não há uma assinatura do Azure disponível para provisionar os recursos (Function App, Storage Account, etc.). Todo o fluxo — RabbitMQ, banco de dados e Redis — deve ser levantado na máquina do desenvolvedor.
+> ⚠️ **Este projeto roda apenas localmente.** Não há deploy em nuvem configurado, pois não há uma assinatura do Azure disponível para provisionar os recursos (Function App, Storage Account, etc.). A function em si sempre roda na máquina do desenvolvedor (via `func start` ou Visual Studio) — o que muda é **onde** RabbitMQ, SQL Server e Redis estão hospedados: em containers Docker soltos/Docker Compose, ou em um cluster Kubernetes local.
 
 ### Pré-requisitos
 - [SDK do .NET 9.0](https://dotnet.microsoft.com/download/dotnet/9.0)
 - [Azure Functions Core Tools v4](https://learn.microsoft.com/azure/azure-functions/functions-run-local)
-- Docker (para subir RabbitMQ, SQL Server e Redis) ou instâncias equivalentes já instaladas
 - [Azurite](https://learn.microsoft.com/azure/storage/common/storage-use-azurite) (emulador de Storage exigido pelo runtime do Functions) — pode ser iniciado via `azurite` (npm) ou automaticamente pelo Visual Studio
+- Para a infraestrutura (RabbitMQ, SQL Server e Redis), escolha **uma** das opções abaixo:
+  - **Opção A — Docker:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) ou Docker Engine (com Docker Compose, se for usar essa variante)
+  - **Opção B — Kubernetes:** um cluster local ([Minikube](https://minikube.sigs.k8s.io/), Docker Desktop Kubernetes, Kind, k3d) com `kubectl` configurado
+
+Em ambos os casos, a function roda **fora** do cluster/containers (direto na máquina do desenvolvedor via `func start`), então o que muda entre as opções é apenas o `Host`/`Port` apontados no [`local.settings.json`](src/Fcg.Notification.Functions/local.settings.json).
 
 ### 1. Subir a infraestrutura local
 
-**RabbitMQ:**
+#### Opção A — Docker
+
+**Via containers avulsos (`docker run`):**
 ```bash
 docker run -d --name rabbitmq-dev -p 5672:5672 -p 15672:15672 rabbitmq:3-management-alpine
 ```
-
-**SQL Server:**
 ```bash
 docker run -d --name sqlserver-dev -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=TechChallenge@2026" -p 1433:1433 mcr.microsoft.com/mssql/server:2022-latest
 ```
-
-**Redis:**
 ```bash
 docker run -d --name redis-dev -p 6379:6379 redis:7-alpine redis-server --requirepass TechChallenge@2026
 ```
 
-As credenciais acima já correspondem ao [`local.settings.json`](src/Fcg.Notification.Functions/local.settings.json) padrão do projeto.
+**Via Docker Compose (reaproveitando a stack do [`fcg-infrastructure`](../fcg-infrastructure)):**
+```bash
+docker compose up -d fcg-db-central rabbitmq redis
+```
+> Rode o comando a partir da raiz do repositório `fcg-infrastructure` (`.env` já configurado — veja o README daquele repositório). Ele sobe apenas os três serviços de infraestrutura necessários pela notification function, sem subir as demais APIs.
+
+Nas duas variantes, os containers publicam as portas diretamente no host (`-p host:container`), então o `local.settings.json` **permanece com `Host: "localhost"`** e as portas padrão (`1433`, `5672`, `6379`) — exatamente como no exemplo da seção anterior. Nenhuma alteração é necessária.
+
+#### Opção B — Kubernetes
+
+Os manifestos de infraestrutura (SQL Server, RabbitMQ, Redis) também vivem no repositório [`fcg-infrastructure`](../fcg-infrastructure), em `k8s/`. A partir da raiz daquele repositório:
+
+```bash
+kubectl apply -f k8s/secrets/
+kubectl apply -f k8s/configs/
+kubectl apply -f k8s/infra/
+```
+
+Aguarde os pods `fcg-db-central`, `rabbitmq-dev` e `db-redis` ficarem `Running`:
+```bash
+kubectl get pods -w
+```
+
+Isso cria os Services `sql-service` (SQL Server, `ClusterIP`, porta `1433`), `rabbitmq-service` (RabbitMQ, `NodePort`, portas `5672`/`15672`) e `redis-service` (Redis, `ClusterIP`, porta `6379`). Como a function roda fora do cluster, você precisa **expor cada Service no host** para obter o IP/porta a usar no `local.settings.json` — a forma de expor depende do tipo do Service:
+
+**RabbitMQ (`rabbitmq-service`, tipo `NodePort`) — acessível via `minikube service --url`:**
+```bash
+minikube service rabbitmq-service --url
+```
+Isso imprime uma URL por porta exposta, por exemplo:
+```
+http://192.168.49.2:30672
+http://192.168.49.2:32672
+```
+A primeira URL (porta `30672` → `5672` no container) é o endpoint AMQP a usar. Use o IP e a porta retornados para montar `RabbitMqSettings:Host`, `RabbitMqSettings:Port` e `RabbitMqConnection`.
+
+> Alternativa manual (equivalente ao comando acima, sem depender do Minikube): `minikube ip` retorna o IP do node, e `kubectl get svc rabbitmq-service` mostra o `NodePort` de cada porta — combine os dois (`<minikube-ip>:<nodePort>`).
+
+**SQL Server (`sql-service`) e Redis (`redis-service`) — tipo `ClusterIP`, sem `NodePort`, então `minikube service --url` não funciona para eles.** Use `kubectl port-forward` em vez disso, em um terminal separado para cada um (mantenha rodando enquanto usa a function):
+```bash
+kubectl port-forward svc/sql-service 1433:1433
+```
+```bash
+kubectl port-forward svc/redis-service 6379:6379
+```
+Como o `port-forward` escuta em `localhost`, `DatabaseSettings:Host` e `RedisSettings:Host` continuam como `localhost` — só é preciso garantir que os dois comandos acima fiquem ativos.
+
+**Resumo de como preencher o `local.settings.json` na Opção B:**
+
+| Chave | Valor |
+|---|---|
+| `DatabaseSettings:Host` / `Port` | `localhost` / `1433` (via `kubectl port-forward svc/sql-service`) |
+| `RabbitMqSettings:Host` / `Port` | IP e porta retornados por `minikube service rabbitmq-service --url` |
+| `RabbitMqConnection` | `amqp://guest:guest@<ip-do-rabbitmq>:<porta-do-rabbitmq>` |
+| `RedisSettings:Host` / `Port` | `localhost` / `6379` (via `kubectl port-forward svc/redis-service`) |
+
+As credenciais (`sa`/`TechChallenge@2026` para o SQL Server, `guest`/`guest` para o RabbitMQ, `TechChallenge@2026` para o Redis) são as mesmas definidas nos Secrets de `k8s/secrets/` e já correspondem aos valores padrão do [`local.settings.json`](src/Fcg.Notification.Functions/local.settings.json).
 
 ### 2. Aplicar as migrations no banco (Update-Database)
 
