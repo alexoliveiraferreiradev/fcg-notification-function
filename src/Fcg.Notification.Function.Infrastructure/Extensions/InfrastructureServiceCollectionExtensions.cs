@@ -17,13 +17,13 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
             IConfiguration configuration)
         {
             services.AddRabbitMqConnectionExtension(configuration);
-            //services.AddCacheExtension(configuration);
+            services.AddCacheExtension(configuration);
             services.AddHealthCheckExtension(configuration);
             services.AddDatabaseExtension(configuration);
             services.AddScoped<IUserSnapshotRepository, UserSnapshotRepository>();   
             services.AddScoped<INotificationRepository, NotificationRepository>();           
             services.AddScoped<IEmailService, EmailService>();
-            //services.AddScoped<IIdempotencyService, RedisIdempotencyService>();
+            services.AddScoped<IIdempotencyService, RedisIdempotencyService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
