@@ -42,7 +42,7 @@ namespace Fcg.Notification.Function.Application.Tests.UseCase.WelcomeEmail
         {
             // Arrange
             var command = new SendWelcomeEmailCommand(Guid.NewGuid(), Guid.NewGuid(), "teste@teste.com", "Joao");
-            var userSnapshot = new UserSnapshot(command.UserId,command.UserName,command.Email);
+            var userSnapshot = new UserSnapshot(command.UserId, command.UserName, command.Email, DateTime.UtcNow);
             _userSnapshotRepositoryMock.Setup(s => s.GetByUserIdAsync(userSnapshot.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(userSnapshot);
 
             // Act
@@ -64,7 +64,7 @@ namespace Fcg.Notification.Function.Application.Tests.UseCase.WelcomeEmail
         {
             // Arrange
             var command = new SendWelcomeEmailCommand(Guid.NewGuid(), Guid.NewGuid(), "teste@teste.com", "Joao");
-            var userSnapshot = new UserSnapshot(command.UserId, command.UserName, command.Email);
+            var userSnapshot = new UserSnapshot(command.UserId, command.UserName, command.Email, DateTime.UtcNow);
             _userSnapshotRepositoryMock.Setup(s => s.GetByUserIdAsync(userSnapshot.UserId, It.IsAny<CancellationToken>())).ReturnsAsync(userSnapshot);
 
 

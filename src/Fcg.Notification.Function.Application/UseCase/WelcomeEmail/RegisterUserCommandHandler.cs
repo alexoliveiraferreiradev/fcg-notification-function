@@ -22,13 +22,13 @@ namespace Fcg.Notification.Function.Application.UseCase.WelcomeEmail
             if(snapshot is null )
             {
                 _userSnapshotRepository.Add(new UserSnapshot(request.UserId, request.UserName,
-                request.Email));
+                request.Email, request.occurredAt));
             }
             else
-                snapshot.ApplyChanges(request.UserName, request.occurredAt);
+                snapshot.ApplyChanges(request.UserName, request.Email, request.occurredAt);
 
 
-            await _unitOfWork.CommitAsync();   
+            await _unitOfWork.CommitAsync();
         }
     }
 }
