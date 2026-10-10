@@ -13,6 +13,7 @@ namespace Fcg.Notification.Function.Infrastructure.MessageBroker
         private const string ContractsNamespace = "Fcg.Core.SharedContracts.MessageContracts";
 
         public const string UserCreatedQueue = "notification-user-created";
+        public const string UserRepublishedQueue = "notification-user-republished";
         public const string PaymentProcessedQueue = "notification-payment-processed";
         public const string PaymentFailedQueue = "notification-payment-failed";
         public const string DeliveryFailedQueue = "notification-delivery-failed";
@@ -21,6 +22,7 @@ namespace Fcg.Notification.Function.Infrastructure.MessageBroker
             new Dictionary<string, string>
             {
                 [UserCreatedQueue] = $"{ContractsNamespace}:IUserCreatedIntegrationEvent",
+                [UserRepublishedQueue] = $"{ContractsNamespace}:IRepublishUserIntegrationEvent",
                 [PaymentProcessedQueue] = $"{ContractsNamespace}:IPaymentProcessedIntegrationEvent",
                 [PaymentFailedQueue] = $"{ContractsNamespace}:IPaymentFailedIntegrationEvent",
                 [DeliveryFailedQueue] = $"{ContractsNamespace}:IDeliveryFailedIntegrationEvent",
