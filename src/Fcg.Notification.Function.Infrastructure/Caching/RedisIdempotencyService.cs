@@ -27,8 +27,8 @@ namespace Fcg.Notification.Function.Infrastructure.Idempotency
         {
             var db = _redis.GetDatabase();
             var fullKey = $"{_redisOptions.InstanceName}{key}";
-            var expiry = TimeSpan.FromDays(_redisOptions.ExpirationInDays);
-            return await db.StringSetAsync(fullKey, "processing_or_processed", expiry, When.NotExists);
+            var days = _redisOptions.ExpirationInDays > 0 ? _redisOptions.ExpirationInDays : 7;
+            return await db.StringSetAsync(fullKey, "processing_or_processed", TimeSpan.FromDays(days), When.NotExists);
         }
     }
 }
