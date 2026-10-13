@@ -25,7 +25,7 @@ public class SyncRepublishedUserFunction
     }
 
     [Function(nameof(SyncRepublishedUserFunction))]
-    public async Task Run([RabbitMQTrigger(NotificationRabbitTopology.UserRepublishedQueue, ConnectionStringSetting = "RabbitMqConnection")] string message)
+    public async Task Run([ServiceBusTrigger(NotificationBusTopology.UserRepublishedTopic, NotificationBusTopology.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
         var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<RepublishUserIntegrationEvent>>(message,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -38,6 +38,6 @@ public class SyncRepublishedUserFunction
         }
 
         await _sender.Send(new RegisterUserCommand(evt.EventId, evt.UserId, evt.Name, evt.Email, evt.CreatedAt));
-        _logger.LogInformation("RabbitMqTrigger: Sync Republished User function processada: {item}", evt);
+        _logger.LogInformation("ServiceBusTrigger: Sync Republished User function processada: {item}", evt);
     }
 }

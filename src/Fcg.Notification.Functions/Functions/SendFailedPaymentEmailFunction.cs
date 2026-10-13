@@ -21,8 +21,7 @@ public class SendFailedPaymentEmailFunction
     }
 
     [Function(nameof(SendFailedPaymentEmailFunction))]
-    public async Task Run([RabbitMQTrigger(NotificationRabbitTopology.PaymentFailedQueue,
-        ConnectionStringSetting = "RabbitMqConnection")] string message)
+    public async Task Run([ServiceBusTrigger(NotificationBusTopology.PurchaseRejectedTopic, NotificationBusTopology.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
         var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<PaymentFailedIntegrationEvent>>(message,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
@@ -35,6 +34,6 @@ public class SendFailedPaymentEmailFunction
         }
 
         await _sender.Send(new SendPaymentRejectCommand(evt.EventId, evt.OrderId, evt.UserId, evt.Reason));
-        _logger.LogInformation("RabbitMqTrigger: Função Send Failed Payment processada: {item}", message);
+        _logger.LogInformation("ServiceBusTrigger: Função Send Failed Payment processada: {item}", message);
     }
 }

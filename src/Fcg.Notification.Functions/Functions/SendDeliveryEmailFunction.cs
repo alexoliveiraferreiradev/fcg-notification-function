@@ -1,11 +1,10 @@
-using System;
-using System.Text.Json;
 using Fcg.Notification.Function.Application.UseCase.DeliveryFailedEmail;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
 using Fcg.Notification.Function.Infrastructure.MessageBroker.Messages;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Fcg.Notification.FunctionApp.Functions;
 
@@ -20,8 +19,7 @@ public class SendDeliveryEmailFunction
     }
 
     [Function(nameof(SendDeliveryEmailFunction))]
-    public async Task Run([RabbitMQTrigger(NotificationRabbitTopology.DeliveryFailedQueue,
-        ConnectionStringSetting = "RabbitMqConnection")] string message)
+    public async Task Run([ServiceBusTrigger(NotificationBusTopology.DeliveryFailedTopic, NotificationBusTopology.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
         var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<DeliveryFailedIntegrationEvent>>(message,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
@@ -34,6 +32,6 @@ public class SendDeliveryEmailFunction
         }
 
         await _sender.Send(new SendDeliveryFailedEmailCommand(evt.EventId, evt.OrderId, evt.UserId, evt.Reason));
-        _logger.LogInformation("RabbitMqTrigger: Função Send Delivery Email processada: {item}", message);
+        _logger.LogInformation("ServiceBusTrigger: Função Send Delivery Email processada: {item}", message);
     }
 }

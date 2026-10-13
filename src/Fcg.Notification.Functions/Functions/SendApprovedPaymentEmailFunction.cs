@@ -21,8 +21,7 @@ public class SendApprovedPaymentEmailFunction
     }
 
     [Function(nameof(SendApprovedPaymentEmailFunction))]
-    public async Task Run([RabbitMQTrigger(NotificationRabbitTopology.PaymentProcessedQueue,
-        ConnectionStringSetting = "RabbitMqConnection")] string message)
+    public async Task Run([ServiceBusTrigger(NotificationBusTopology.PaymentApprovedTopic, NotificationBusTopology.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
         var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<PaymentProcessedIntegrationEvent>>(message,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -36,6 +35,6 @@ public class SendApprovedPaymentEmailFunction
 
         await _sender.Send(new SendPaymentApprovedEmailCommand(evt.EventId,evt.UserId,evt.OrderId, evt.CreatedAt)); 
 
-        _logger.LogInformation("RabbitMqTrigger: Function Send Approved Payment Email processada: {item}", message);
+        _logger.LogInformation("ServiceBusTrigger: Function Send Approved Payment Email processada: {item}", message);
     }
 }

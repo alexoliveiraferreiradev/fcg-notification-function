@@ -6,7 +6,6 @@ using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RabbitMQ.Client;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -28,6 +27,4 @@ using (var scope = host.Services.CreateScope())
     await NotificationSeed.ApplyMigrationsAsync(dbContext);
 }
 
-var connection = host.Services.GetRequiredService<IConnection>();
-await NotificationRabbitTopology.DeclareAllAsync(connection);
 await host.RunAsync();
