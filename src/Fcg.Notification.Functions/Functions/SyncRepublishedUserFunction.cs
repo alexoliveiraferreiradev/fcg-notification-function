@@ -1,3 +1,4 @@
+using Fcg.Core.SharedContracts.Messaging;
 using Fcg.Notification.Function.Application.UseCase.WelcomeEmail;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
 using Fcg.Notification.Function.Infrastructure.MessageBroker.Messages;
@@ -25,7 +26,7 @@ public class SyncRepublishedUserFunction
     }
 
     [Function(nameof(SyncRepublishedUserFunction))]
-    public async Task Run([ServiceBusTrigger(NotificationBusTopology.UserRepublishedTopic, NotificationBusTopology.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
+    public async Task Run([ServiceBusTrigger(Topics.UserRepublished, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
         var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<RepublishUserIntegrationEvent>>(message,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });

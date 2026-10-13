@@ -1,3 +1,4 @@
+using Fcg.Core.SharedContracts.Messaging;
 using Fcg.Notification.Function.Application.UseCase.WelcomeEmail;
 using Fcg.Notification.Function.Domain.Entities;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
@@ -21,7 +22,7 @@ public class SendWelcomeFunction
     }
 
     [Function(nameof(SendWelcomeFunction))]
-    public async Task Run([ServiceBusTrigger(NotificationBusTopology.UserCreatedTopic, NotificationBusTopology.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
+    public async Task Run([ServiceBusTrigger(Topics.UserCreated, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
         var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<UserCreatedIntegrationEvent>>(message, 
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true});

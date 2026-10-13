@@ -31,7 +31,7 @@ src/
 
 ## 📐 Fluxo de Integração e Eventos Consumidos
 
-Os microsserviços publicam os eventos com MassTransit em **tópicos com nome fixo** (definidos via `SetEntityName` em cada API). A function escuta cada tópico pela subscription `notification`, conforme declarado em `NotificationBusTopology`:
+Os microsserviços publicam os eventos com MassTransit em **tópicos com nome fixo** (definidos via `SetEntityName` em cada API). A function escuta cada tópico pela subscription `notification`. Os nomes dos tópicos e da subscription vêm da classe `Topics` do pacote `Fcg.Core.SharedContracts` (namespace `Fcg.Core.SharedContracts.Messaging`), compartilhada com as APIs:
 
 | Function | Tópico / Subscription | Evento consumido | Publicado por |
 |---|---|---|---|

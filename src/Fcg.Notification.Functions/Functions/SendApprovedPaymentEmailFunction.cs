@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using Fcg.Core.SharedContracts.Messaging;
 using Fcg.Notification.Function.Application.UseCase.ApprovedPaymentEmail;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
 using Fcg.Notification.Function.Infrastructure.MessageBroker.Messages;
@@ -21,7 +22,7 @@ public class SendApprovedPaymentEmailFunction
     }
 
     [Function(nameof(SendApprovedPaymentEmailFunction))]
-    public async Task Run([ServiceBusTrigger(NotificationBusTopology.PaymentApprovedTopic, NotificationBusTopology.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
+    public async Task Run([ServiceBusTrigger(Topics.PaymentApproved, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
         var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<PaymentProcessedIntegrationEvent>>(message,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });

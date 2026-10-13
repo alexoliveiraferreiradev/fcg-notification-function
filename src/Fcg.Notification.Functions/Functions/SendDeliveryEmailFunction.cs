@@ -1,3 +1,4 @@
+using Fcg.Core.SharedContracts.Messaging;
 using Fcg.Notification.Function.Application.UseCase.DeliveryFailedEmail;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
 using Fcg.Notification.Function.Infrastructure.MessageBroker.Messages;
@@ -19,7 +20,7 @@ public class SendDeliveryEmailFunction
     }
 
     [Function(nameof(SendDeliveryEmailFunction))]
-    public async Task Run([ServiceBusTrigger(NotificationBusTopology.DeliveryFailedTopic, NotificationBusTopology.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
+    public async Task Run([ServiceBusTrigger(Topics.DeliveryFailed, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
         var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<DeliveryFailedIntegrationEvent>>(message,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true});

@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using Fcg.Core.SharedContracts.Messaging;
 using Fcg.Notification.Function.Application.UseCase.PaymentRejectEmail;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
 using Fcg.Notification.Function.Infrastructure.MessageBroker.Messages;
@@ -21,7 +22,7 @@ public class SendFailedPaymentEmailFunction
     }
 
     [Function(nameof(SendFailedPaymentEmailFunction))]
-    public async Task Run([ServiceBusTrigger(NotificationBusTopology.PurchaseRejectedTopic, NotificationBusTopology.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
+    public async Task Run([ServiceBusTrigger(Topics.PurchaseRejected, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
         var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<PaymentFailedIntegrationEvent>>(message,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
