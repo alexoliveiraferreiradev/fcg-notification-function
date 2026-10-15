@@ -24,17 +24,14 @@ public class SendApprovedPaymentEmailFunction
     [Function(nameof(SendApprovedPaymentEmailFunction))]
     public async Task Run([ServiceBusTrigger(Topics.PaymentApproved, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
-        var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<PaymentProcessedIntegrationEvent>>(message,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-        var evt = envelope?.Message;
-
-        if(evt is null)
+        var envelope = EnvelopeReader.Read<PaymentProcessedIntegrationEvent>(message);
+        
+        if(envelope is null)
         {
             throw new InvalidOperationException($"Falha ao deserializar mensagem: {message}");
         }
 
-        await _sender.Send(new SendPaymentApprovedEmailCommand(evt.EventId,evt.UserId,evt.OrderId, evt.CreatedAt)); 
+        await _sender.Send(new SendPaymentApprovedEmailCommand(envelope.EventId, envelope.UserId, envelope.OrderId, envelope.CreatedAt)); 
 
         _logger.LogInformation("ServiceBusTrigger: Function Send Approved Payment Email processada: {item}", message);
     }

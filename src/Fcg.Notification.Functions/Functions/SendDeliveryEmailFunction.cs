@@ -22,17 +22,14 @@ public class SendDeliveryEmailFunction
     [Function(nameof(SendDeliveryEmailFunction))]
     public async Task Run([ServiceBusTrigger(Topics.DeliveryFailed, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
-        var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<DeliveryFailedIntegrationEvent>>(message,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
+        var envelope = EnvelopeReader.Read<DeliveryFailedIntegrationEvent>(message);              
 
-        var evt = envelope?.Message;
-
-        if(evt is null)
+        if(envelope is null)
         {
             throw new InvalidOperationException($"Falha ao deserializar mensagem: {message}");
         }
 
-        await _sender.Send(new SendDeliveryFailedEmailCommand(evt.EventId, evt.OrderId, evt.UserId, evt.Reason));
+        await _sender.Send(new SendDeliveryFailedEmailCommand(envelope.EventId, envelope.OrderId, envelope.UserId, envelope.Reason));
         _logger.LogInformation("ServiceBusTrigger: Função Send Delivery Email processada: {item}", message);
     }
 }

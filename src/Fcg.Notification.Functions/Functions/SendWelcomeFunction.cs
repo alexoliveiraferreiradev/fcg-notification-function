@@ -1,6 +1,5 @@
 using Fcg.Core.SharedContracts.Messaging;
 using Fcg.Notification.Function.Application.UseCase.WelcomeEmail;
-using Fcg.Notification.Function.Domain.Entities;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
 using Fcg.Notification.Function.Infrastructure.MessageBroker.Messages;
 using MediatR;
@@ -24,19 +23,15 @@ public class SendWelcomeFunction
     [Function(nameof(SendWelcomeFunction))]
     public async Task Run([ServiceBusTrigger(Topics.UserCreated, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
-        var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<UserCreatedIntegrationEvent>>(message, 
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
-
+        var envelope = EnvelopeReader.Read<UserCreatedIntegrationEvent>(message);
        
-        var evt = envelope?.Message;
-
-        if(evt is null)
+        if(envelope is null)
         {
             throw new InvalidOperationException($"Falha ao deserializar mensagem: {message}");
         }
 
-        await _sender.Send(new RegisterUserCommand(evt.EventId,evt.UserId,evt.Name,evt.Email,evt.CreatedAt));
-        await _sender.Send(new SendWelcomeEmailCommand(evt.EventId, evt.UserId, evt.Email, evt.Name));
-        _logger.LogInformation("ServiceBusTrigger: Send Welcome function processada: {item}", evt);
+        await _sender.Send(new RegisterUserCommand(envelope.EventId, envelope.UserId, envelope.Name, envelope.Email, envelope.CreatedAt));
+        await _sender.Send(new SendWelcomeEmailCommand(envelope.EventId, envelope.UserId, envelope.Email, envelope.Name));
+        _logger.LogInformation("ServiceBusTrigger: Send Welcome function processada: {item}", envelope);
     }
 }
