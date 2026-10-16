@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Fcg.Notification.Function.Infrastructure.MessageBroker.Messages
+namespace Fcg.Notification.Function.Infrastructure.MessageBroker
 {
     public static class EnvelopeReader
     {
