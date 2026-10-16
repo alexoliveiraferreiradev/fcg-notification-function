@@ -1,5 +1,4 @@
-﻿using Fcg.Core.WebApi.Database;
-using Fcg.Notification.Function.Infrastructure.Persistence;
+﻿using Fcg.Notification.Function.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,16 +10,16 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
         public static IServiceCollection AddDatabaseExtension(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddOptions<DatabaseConnectionSettings>()
-                .Bind(configuration.GetSection(DatabaseConnectionSettings.DatabaseSettingsSection))
+            services.AddOptions<AzureDatabaseSettings>()
+                .Bind(configuration.GetSection(AzureDatabaseSettings.AzureDatabaseSettingsSection))
                 .ValidateDataAnnotations().ValidateOnStart();
 
-            var dbConfig = configuration.GetSection(DatabaseConnectionSettings.DatabaseSettingsSection).Get<DatabaseConnectionSettings>();
-            ArgumentNullException.ThrowIfNull(dbConfig, nameof(DatabaseConnectionSettings));
+            var dbConfig = configuration.GetSection(AzureDatabaseSettings.AzureDatabaseSettingsSection).Get<AzureDatabaseSettings>();
+            ArgumentNullException.ThrowIfNull(dbConfig, nameof(AzureDatabaseSettings));
 
             services.AddDbContext<NotificationDbContext>(options =>
             {
-                options.UseSqlServer(dbConfig.ToConnectionString(), sqlOptions =>
+                options.UseSqlServer(dbConfig.ConnectionString, sqlOptions =>
                 {
                     sqlOptions.EnableRetryOnFailure(
                        maxRetryCount: 3,
@@ -28,7 +27,6 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
                        errorNumbersToAdd: null);
 
                 });
-                               
             });
 
             return services;
