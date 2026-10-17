@@ -23,7 +23,7 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
                 {
                     sqlOptions.EnableRetryOnFailure(
                        maxRetryCount: 3,
-                       maxRetryDelay: TimeSpan.FromSeconds(10),
+                       maxRetryDelay: TimeSpan.FromSeconds(30),
                        errorNumbersToAdd: null);
 
                 });
