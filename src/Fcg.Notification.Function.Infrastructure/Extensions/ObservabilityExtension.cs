@@ -1,7 +1,6 @@
 ﻿using Fcg.Notification.Function.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 
 namespace Fcg.Notification.Function.Infrastructure.Extensions
 {
@@ -12,11 +11,7 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
             services.AddHealthChecks()
                 .AddDbContextCheck<NotificationDbContext>(
                 name: "database-healthcheck",
-                tags: new[] { "ready" })
-               .AddRedis(
-                   sp => sp.GetRequiredService<IConnectionMultiplexer>(),
-                   name: "redis-healthcheck",
-                   tags: new[] { "ready" });
+                tags: new[] { "ready" });
 
             return services;
         }

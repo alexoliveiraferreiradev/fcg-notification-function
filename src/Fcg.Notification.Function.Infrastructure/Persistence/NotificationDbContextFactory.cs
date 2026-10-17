@@ -1,4 +1,3 @@
-using Fcg.Core.WebApi.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -15,11 +14,11 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence
                 .AddEnvironmentVariables()
                 .Build();
 
-            var dbConfig = configuration.GetSection(DatabaseConnectionSettings.DatabaseSettingsSection).Get<DatabaseConnectionSettings>();
-            ArgumentNullException.ThrowIfNull(dbConfig, nameof(DatabaseConnectionSettings));
-            
+            var dbConfig = configuration.GetSection(AzureDatabaseSettings.AzureDatabaseSettingsSection).Get<AzureDatabaseSettings>();
+            ArgumentNullException.ThrowIfNull(dbConfig, nameof(AzureDatabaseSettings));
+
             var options = new DbContextOptionsBuilder<NotificationDbContext>()
-                .UseSqlServer(dbConfig.ToConnectionString())
+                .UseSqlServer(dbConfig.ConnectionString)
                 .Options;
 
             return new NotificationDbContext(options);

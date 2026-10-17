@@ -81,11 +81,7 @@ cp src/Fcg.Notification.Functions/local.settings.example.json src/Fcg.Notificati
 As demais configurações são lidas pelo worker via [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets), carregados quando `AZURE_FUNCTIONS_ENVIRONMENT=Development` (padrão ao rodar com `func start` ou pelo Visual Studio). A partir de `src/Fcg.Notification.Functions`:
 
 ```bash
-dotnet user-secrets set "DatabaseSettings:Host" "localhost"
-dotnet user-secrets set "DatabaseSettings:Port" "1433"
-dotnet user-secrets set "DatabaseSettings:Username" "<usuario-sql>"
-dotnet user-secrets set "DatabaseSettings:Password" "<senha-sql>"
-dotnet user-secrets set "DatabaseSettings:DatabaseName" "Fcg_Notifications"
+dotnet user-secrets set "AzureDatabaseSettings:ConnectionString" "Server=localhost,1433;Database=Fcg_Notifications;User Id=<usuario-sql>;Password=<senha-sql>;TrustServerCertificate=True"
 dotnet user-secrets set "RedisSettings:Host" "localhost"
 dotnet user-secrets set "RedisSettings:Port" "6379"
 dotnet user-secrets set "RedisSettings:Password" "<senha-redis>"
@@ -94,7 +90,7 @@ dotnet user-secrets set "RedisSettings:InstanceName" "FiapCloudGames:"
 
 | Chave | Uso |
 |---|---|
-| `DatabaseSettings:*` | SQL Server do histórico de notificações (também usada pelo `dotnet ef` em design-time) |
+| `AzureDatabaseSettings:ConnectionString` | Connection string do SQL Server do histórico de notificações, com autenticação por usuário e senha (também usada pelo `dotnet ef` em design-time) |
 | `RedisSettings:*` | Redis do controle de idempotência |
 
 ---
@@ -112,7 +108,7 @@ dotnet user-secrets set "RedisSettings:InstanceName" "FiapCloudGames:"
   - **Opção A — Docker:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) ou Docker Engine (com Docker Compose, se for usar essa variante)
   - **Opção B — Kubernetes:** um cluster local ([Minikube](https://minikube.sigs.k8s.io/), Docker Desktop Kubernetes, Kind, k3d) com `kubectl` configurado
 
-Em ambos os casos, a function roda **fora** do cluster/containers, então o que muda entre as opções é apenas o `Host`/`Port` configurados no User Secrets.
+Em ambos os casos, a function roda **fora** do cluster/containers, então o que muda entre as opções é apenas o host/porta configurados no User Secrets (o `Server` da connection string e o `RedisSettings:Host`/`Port`).
 
 ### 1. Subir a infraestrutura local
 
@@ -132,7 +128,7 @@ docker compose up -d fcg-db-central redis
 ```
 > Rode o comando a partir da raiz do repositório `fcg-infrastructure` (`.env` já configurado — veja o README daquele repositório). Ele sobe apenas os serviços de infraestrutura necessários pela notification function, sem subir as demais APIs.
 
-Nas duas variantes, os containers publicam as portas diretamente no host, então `DatabaseSettings:Host` e `RedisSettings:Host` ficam como `localhost`, com as portas padrão (`1433` e `6379`).
+Nas duas variantes, os containers publicam as portas diretamente no host, então o `Server` da `AzureDatabaseSettings:ConnectionString` fica como `localhost,1433` e o `RedisSettings:Host` como `localhost`, com a porta padrão `6379`.
 
 #### Opção B — Kubernetes
 
@@ -155,7 +151,7 @@ kubectl port-forward svc/sql-service 1433:1433
 ```bash
 kubectl port-forward svc/redis-service 6379:6379
 ```
-Como o `port-forward` escuta em `localhost`, `DatabaseSettings:Host` e `RedisSettings:Host` continuam como `localhost`. As credenciais são as definidas nos Secrets do cluster.
+Como o `port-forward` escuta em `localhost`, o `Server` da `AzureDatabaseSettings:ConnectionString` continua como `localhost,1433` e o `RedisSettings:Host` como `localhost`. As credenciais (`User Id`/`Password` do SQL e senha do Redis) são as definidas nos Secrets do cluster.
 
 ### 2. Aplicar as migrations no banco (Update-Database)
 

@@ -2,7 +2,8 @@
 {
     public interface IIdempotencyService
     {
-        Task<bool> TryProcessAsync(string key);
-        Task ReleaseAsync(string key);
+        Task<bool> TryProcessAsync(string key, CancellationToken cancellationToken);
+        Task<bool> AlreadyProcessed(string key, CancellationToken cancellationToken);
+        Task<int> PurgeExpiredAsync(CancellationToken cancellationToken);
     }
 }

@@ -9,8 +9,7 @@
   <ItemGroup>    
     <PackageReference Include="Fcg.Core.SharedContracts" Version="1.1.7" />  
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.17" />
-    <PackageReference Include="MediatR" Version="14.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.15" />
+    <PackageReference Include="MediatR" Version="14.1.0" />   
   </ItemGroup>
 
   <ItemGroup>
