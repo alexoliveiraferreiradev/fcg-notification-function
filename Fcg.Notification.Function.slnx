@@ -8,5 +8,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/Fcg.Notification.Function.Application.Tests/Fcg.Notification.Function.Application.Tests.csproj" Id="5a8db684-2f72-4204-ad95-ec24142478cc" />
     <Project Path="tests/Fcg.Notification.Function.Domain.Tests/Fcg.Notification.Function.Domain.Tests.csproj" Id="a96111f2-ec8c-43bd-91ab-dd44baab1ee1" />
+    <Project Path="tests/Fcg.Notification.Function.Infrastructure.Tests/Fcg.Notification.Function.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>
