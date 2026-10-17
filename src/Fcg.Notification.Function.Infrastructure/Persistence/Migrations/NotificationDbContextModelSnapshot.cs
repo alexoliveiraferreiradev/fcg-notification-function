@@ -50,6 +50,21 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence.Migrations
                     b.ToTable("Notifications", (string)null);
                 });
 
+            modelBuilder.Entity("Fcg.Notification.Function.Domain.Entities.ProcessedMessage", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Key");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.ToTable("ProcessedMessages", (string)null);
+                });
+
             modelBuilder.Entity("Fcg.Notification.Function.Domain.Entities.UserSnapshot", b =>
                 {
                     b.Property<Guid>("Id")

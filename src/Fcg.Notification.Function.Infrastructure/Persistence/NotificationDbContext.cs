@@ -7,7 +7,8 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence
     {
         public NotificationDbContext(DbContextOptions<NotificationDbContext> options) : base(options) { }
         public DbSet<NotificationMessage> Notifications { get; set; }
-        public DbSet<UserSnapshot> UserSnapshots { get;set; }   
+        public DbSet<UserSnapshot> UserSnapshots { get;set; }
+        public DbSet<ProcessedMessage> ProcessedMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
