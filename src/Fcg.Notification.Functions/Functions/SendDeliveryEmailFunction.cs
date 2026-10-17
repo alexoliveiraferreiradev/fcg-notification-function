@@ -1,11 +1,11 @@
-using System;
-using System.Text.Json;
+using Fcg.Core.SharedContracts.Messaging;
 using Fcg.Notification.Function.Application.UseCase.DeliveryFailedEmail;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
 using Fcg.Notification.Function.Infrastructure.MessageBroker.Messages;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace Fcg.Notification.FunctionApp.Functions;
 
@@ -20,20 +20,16 @@ public class SendDeliveryEmailFunction
     }
 
     [Function(nameof(SendDeliveryEmailFunction))]
-    public async Task Run([RabbitMQTrigger(NotificationRabbitTopology.DeliveryFailedQueue,
-        ConnectionStringSetting = "RabbitMqConnection")] string message)
+    public async Task Run([ServiceBusTrigger(Topics.DeliveryFailed, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
-        var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<DeliveryFailedIntegrationEvent>>(message,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
+        var envelope = EnvelopeReader.Read<DeliveryFailedIntegrationEvent>(message);              
 
-        var evt = envelope?.Message;
-
-        if(evt is null)
+        if(envelope is null)
         {
             throw new InvalidOperationException($"Falha ao deserializar mensagem: {message}");
         }
 
-        await _sender.Send(new SendDeliveryFailedEmailCommand(evt.EventId, evt.OrderId, evt.UserId, evt.Reason));
-        _logger.LogInformation("RabbitMqTrigger: Função Send Delivery Email processada: {item}", message);
+        await _sender.Send(new SendDeliveryFailedEmailCommand(envelope.EventId, envelope.OrderId, envelope.UserId, envelope.Reason));
+        _logger.LogInformation("ServiceBusTrigger: Função Send Delivery Email processada: {item}", message);
     }
 }

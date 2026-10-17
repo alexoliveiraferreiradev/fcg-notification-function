@@ -16,7 +16,6 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
         public static IServiceCollection AddInfrastructure(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddRabbitMqConnectionExtension(configuration);
             services.AddCacheExtension(configuration);
             services.AddHealthCheckExtension(configuration);
             services.AddDatabaseExtension(configuration);

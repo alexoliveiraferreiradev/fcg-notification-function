@@ -1,3 +1,4 @@
+using Fcg.Core.SharedContracts.Messaging;
 using Fcg.Notification.Function.Application.UseCase.WelcomeEmail;
 using Fcg.Notification.Function.Infrastructure.MessageBroker;
 using Fcg.Notification.Function.Infrastructure.MessageBroker.Messages;
@@ -25,19 +26,16 @@ public class SyncRepublishedUserFunction
     }
 
     [Function(nameof(SyncRepublishedUserFunction))]
-    public async Task Run([RabbitMQTrigger(NotificationRabbitTopology.UserRepublishedQueue, ConnectionStringSetting = "RabbitMqConnection")] string message)
+    public async Task Run([ServiceBusTrigger(Topics.UserRepublished, Topics.NotificationSubscription, Connection = NotificationBusTopology.ConnectionName)] string message)
     {
-        var envelope = JsonSerializer.Deserialize<MassTransitEnvelope<RepublishUserIntegrationEvent>>(message,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var envelope = EnvelopeReader.Read<RepublishUserIntegrationEvent>(message);
 
-        var evt = envelope?.Message;
-
-        if (evt is null)
+        if (envelope is null)
         {
             throw new InvalidOperationException($"Falha ao deserializar mensagem: {message}");
         }
 
-        await _sender.Send(new RegisterUserCommand(evt.EventId, evt.UserId, evt.Name, evt.Email, evt.CreatedAt));
-        _logger.LogInformation("RabbitMqTrigger: Sync Republished User function processada: {item}", evt);
+        await _sender.Send(new RegisterUserCommand(envelope.EventId, envelope.UserId, envelope.Name, envelope.Email, envelope.CreatedAt));
+        _logger.LogInformation("ServiceBusTrigger: Sync Republished User function processada: {item}", envelope);
     }
 }

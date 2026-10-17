@@ -10,6 +10,8 @@ namespace Fcg.Notification.Function.Domain.Entities
         public string Email { get; private set; } = string.Empty;
         public DateTime LastSyncedAt { get; private set; }
 
+        protected UserSnapshot() { }
+
         public UserSnapshot(Guid userId, string name, string email, DateTime occurredAt)
         {
             UserId = userId;
