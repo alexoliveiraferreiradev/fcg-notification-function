@@ -406,3 +406,4 @@ local.settings.json
 # Arquivos gerados pelo Visual Studio ao publicar no Azure
 **/Properties/ServiceDependencies/
 **/Properties/serviceDependencies.*.json
+**/Properties/serviceDependencies.json
