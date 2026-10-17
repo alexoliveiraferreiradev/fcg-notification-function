@@ -11,8 +11,7 @@
 	<ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.15" />
-    <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.15" />   
 	<PackageReference Include="Fcg.Core.WebApi" Version="1.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.15" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.15">
@@ -26,6 +25,10 @@
 		</PackageReference>
 	</ItemGroup>
 
+
+	<ItemGroup>
+	  <InternalsVisibleTo Include="Fcg.Notification.Function.Infrastructure.Tests" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Fcg.Notification.Function.Application\Fcg.Notification.Function.Application.csproj" />
