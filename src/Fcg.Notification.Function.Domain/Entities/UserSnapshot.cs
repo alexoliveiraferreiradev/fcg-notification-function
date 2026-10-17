@@ -1,6 +1,5 @@
 ﻿using Fcg.Core.Abstractions.Common;
 using Fcg.Core.Abstractions.Resources;
-using Fcg.Notification.Function.Domain.ValueObject;
 
 namespace Fcg.Notification.Function.Domain.Entities
 {
@@ -11,26 +10,29 @@ namespace Fcg.Notification.Function.Domain.Entities
         public string Email { get; private set; } = string.Empty;
         public DateTime LastSyncedAt { get; private set; }
 
-        public UserSnapshot(Guid userId, string name, string email)
+        public UserSnapshot(Guid userId, string name, string email, DateTime occurredAt)
         {
             UserId = userId;
             Name = name;
             Email = email;
+            LastSyncedAt = occurredAt;
             ValidateEntity();
         }
 
-        public void ApplyChanges(string newName, DateTime occurredAt)
+        public void ApplyChanges(string newName, string newEmail, DateTime occurredAt)
         {
             if (occurredAt < LastSyncedAt) return;
             AssertionConcern.AssertArgumentNotNull(newName, DomainMessages.UserNameRequired);
+            AssertionConcern.AssertArgumentNotNull(newEmail, DomainMessages.UserEmailRequired);
             Name = newName;
+            Email = newEmail;
             LastSyncedAt = occurredAt;
         }
 
         protected override void ValidateEntity()
         {
             AssertionConcern.AssertArgumentNotNull(Name, DomainMessages.UserNameRequired);
-            AssertionConcern.AssertArgumentNotNull(Email, DomainMessages.UserEmailRequired);    
+            AssertionConcern.AssertArgumentNotNull(Email, DomainMessages.UserEmailRequired);
         }
     }
 }
