@@ -24,11 +24,7 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence
             return new NotificationDbContext(options);
         }
 
-        /// <summary>
-        /// Em runtime é o host do Functions que promove Values do local.settings.json a variáveis
-        /// de ambiente. Esse host não roda em design-time, então replicamos a conversão aqui:
-        /// as chaves vêm achatadas com "__", que é o separador hierárquico da configuração.
-        /// </summary>
+       
         private static IEnumerable<KeyValuePair<string, string?>> ReadLocalSettings()
         {
             var localSettings = new ConfigurationBuilder()
