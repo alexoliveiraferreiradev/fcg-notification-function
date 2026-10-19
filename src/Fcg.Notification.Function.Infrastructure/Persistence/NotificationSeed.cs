@@ -4,11 +4,11 @@ namespace Fcg.Notification.Function.Infrastructure.Persistence
 {
     public static class NotificationSeed
     {
-        public static async Task ApplyMigrationsAsync(NotificationDbContext context)
+        public static async Task ApplyMigrationsAsync(NotificationDbContext context, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            await context.Database.MigrateAsync();
+            await context.Database.MigrateAsync(cancellationToken);
         }
     }
 }
