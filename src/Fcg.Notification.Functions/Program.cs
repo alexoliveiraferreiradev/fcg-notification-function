@@ -1,10 +1,7 @@
 using Fcg.Notification.Function.Application.Extensions;
 using Fcg.Notification.Function.Infrastructure.Extensions;
-using Fcg.Notification.Function.Infrastructure.MessageBroker;
-using Fcg.Notification.Function.Infrastructure.Persistence;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = FunctionsApplication.CreateBuilder(args);
@@ -20,11 +17,5 @@ builder.Services.AddAplicationServices();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var host = builder.Build();
-
-using (var scope = host.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
-    await NotificationSeed.ApplyMigrationsAsync(dbContext);
-}
 
 await host.RunAsync();
