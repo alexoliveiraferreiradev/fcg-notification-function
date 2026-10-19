@@ -29,6 +29,8 @@ namespace Fcg.Notification.Function.Infrastructure.Extensions
                 });
             });
 
+            services.AddHostedService<DatabaseMigrationHostedService>();
+
             return services;
         }
     }
